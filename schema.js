@@ -1,10 +1,6 @@
 const { gql } = require("apollo-server");
-const DataLoader = require("dataloader");
 
 const typeDefs = gql`
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-
-  # This "Book" type defines the queryable fields for every book in our data source.
   type School {
     name: String
     students: [Student!]!
@@ -15,9 +11,6 @@ const typeDefs = gql`
     name: String
   }
 
-  # The "Query" type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
   type Query {
     GetSchoolById(id: ID): School
   }
@@ -52,9 +45,8 @@ const students = [
 
 let getStudentsNameBatchedCounter = 0;
 
-const studentLoader = new DataLoader(keys => getStudentsNameBatched(keys));
 
-const getStudentsNameBatched = ids => {
+exports.getStudentsNameBatched = ids => {
   getStudentsNameBatchedCounter++;
   return new Promise(resolve => resolve(ids.map(getStudentName)));
 };
@@ -79,7 +71,7 @@ const resolvers = {
     }
   },
   Student: {
-    name: student => studentLoader.load(student.id)
+    name: (student, _, {studentLoader}) => studentLoader.load(student.id)
   }
 };
 

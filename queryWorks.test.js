@@ -1,21 +1,9 @@
 const gql = require("graphql-tag");
-const { ApolloClient } = require("apollo-client");
-const { InMemoryCache } = require("apollo-cache-inmemory");
-const { SchemaLink } = require("apollo-link-schema");
-const { makeExecutableSchema } = require("graphql-tools");
-const { schema, getStudentNameCounter } = require("./schema");
+const {client} = require("./testUtils/createApolloClient")
 
-const executableSchema = makeExecutableSchema(schema);
-
-const graphqlClient = new ApolloClient({
-  ssrMode: true,
-  cache: new InMemoryCache(),
-  link: new SchemaLink({ schema: executableSchema })
-});
 
 test("Gets schools with students", async () => {
-  const result = await graphqlClient.query({
-    query: gql`
+  const result = await client.query({ query: gql`
       query GetSchoolById($id: ID) {
         GetSchoolById(id: $id) {
           name
@@ -25,9 +13,7 @@ test("Gets schools with students", async () => {
           }
         }
       }
-    `,
-    variables: { id: "1" }
-  });
+    `, variables: { id: "1" } });
   expect(result.data.GetSchoolById).toEqual({
     name: "High School",
     students: [

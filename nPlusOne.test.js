@@ -1,20 +1,9 @@
 const gql = require("graphql-tag");
-const { ApolloClient } = require("apollo-client");
-const { InMemoryCache } = require("apollo-cache-inmemory");
-const { SchemaLink } = require("apollo-link-schema");
-const { makeExecutableSchema } = require("graphql-tools");
-const { schema, getStudentsNameBatchedCounter } = require("./schema");
-
-const executableSchema = makeExecutableSchema(schema);
-
-const graphqlClient = new ApolloClient({
-  ssrMode: true,
-  cache: new InMemoryCache(),
-  link: new SchemaLink({ schema: executableSchema })
-});
+const { client } = require("./testUtils/createApolloClient");
+const { getStudentsNameBatchedCounter } = require("./schema");
 
 test("Make sure the getStudentName function gets called only once", async () => {
-  const result = await graphqlClient.query({
+  const result = await client.query({
     query: gql`
       query GetSchoolById($id: ID) {
         GetSchoolById(id: $id) {
